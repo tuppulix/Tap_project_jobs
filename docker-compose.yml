@@ -45,11 +45,7 @@ services:
       bash -c "set -v
               cd /opt/kafka
               kafka-topics.sh --bootstrap-server 10.0.9.23:9092 --list
-<<<<<<< HEAD
               kafka-topics.sh --create --bootstrap-server 10.0.9.23:9092 --replication-factor 1 --partitions 1 --topic job_topic
-=======
-              kafka-topics.sh --create --bootstrap-server 10.0.9.23:9092 --replication-factor 1 --partitions 1 --topic messaggi
->>>>>>> dc65747e76de0fbc18d3a33336ac6ad5b08b8d16
               kafka-topics.sh --bootstrap-server 10.0.9.23:9092 --list"
     depends_on: 
         - kafka_zookeeper
@@ -75,11 +71,6 @@ services:
       tap:
         ipv4_address: 10.0.9.25
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> dc65747e76de0fbc18d3a33336ac6ad5b08b8d16
   producer:
     container_name: producer 
     build:

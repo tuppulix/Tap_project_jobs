@@ -1,0 +1,109 @@
+version: "3"
+
+services:
+  kafka_zookeeper:
+    build:
+      context: ./kafka
+      dockerfile: Dockerfile
+    container_name: kafka_zookeeper
+    ports:
+      - 2181:2181
+    command: > 
+      bash -c "set -v
+              mkdir -p /tmp/zookeeper
+              cd /opt/kafka
+              zookeeper-server-start.sh config/zookeeper.properties"
+    networks:
+      tap:
+        ipv4_address: 10.0.9.22
+
+  
+  kafka_broker:
+    build:
+      context: ./kafka
+      dockerfile: Dockerfile
+    container_name: kafka_broker
+    depends_on:
+      - kafka_zookeeper
+    ports:
+      - 9092:9092
+    command: > 
+      bash -c "set -v
+              cd /opt/kafka
+              kafka-server-start.sh config/server.properties"
+    networks:
+      tap:
+        ipv4_address: 10.0.9.23
+
+
+  job_topic:
+    build:
+      context: ./kafka
+      dockerfile: Dockerfile
+    container_name: job_topic
+    command: > 
+      bash -c "set -v
+              cd /opt/kafka
+              kafka-topics.sh --bootstrap-server 10.0.9.23:9092 --list
+<<<<<<< HEAD
+              kafka-topics.sh --create --bootstrap-server 10.0.9.23:9092 --replication-factor 1 --partitions 1 --topic job_topic
+=======
+              kafka-topics.sh --create --bootstrap-server 10.0.9.23:9092 --replication-factor 1 --partitions 1 --topic messaggi
+>>>>>>> dc65747e76de0fbc18d3a33336ac6ad5b08b8d16
+              kafka-topics.sh --bootstrap-server 10.0.9.23:9092 --list"
+    depends_on: 
+        - kafka_zookeeper
+        - kafka_broker
+    networks:
+      tap:
+    
+
+  fluentd:
+    container_name: fluentd
+    build:
+      context: ./fluentd
+      dockerfile: Dockerfile
+    depends_on:
+      - job_topic
+    volumes:
+      - ./fluentd/conf:/fluentd/etc/
+    restart: always
+    command: >
+            bash -c 'fluentd -c /fluentd/etc/fluentd.conf'
+    mem_limit: 512m
+    networks:
+      tap:
+        ipv4_address: 10.0.9.25
+
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> dc65747e76de0fbc18d3a33336ac6ad5b08b8d16
+  producer:
+    container_name: producer 
+    build:
+      context: ./archive
+      dockerfile: Dockerfile
+    depends_on:
+      - fluentd
+    networks:
+      tap:
+        ipv4_address: 10.0.9.26
+
+  spark:
+    container_name: spark
+    build:
+      context: ./spark
+      dockerfile: Dockerfile
+    depends_on:
+      - kafka_zookeeper
+      - kafka_broker
+      - job_topic
+    networks:
+      tap:
+        ipv4_address: 10.0.9.27
+
+networks:
+  tap:
+    external: true

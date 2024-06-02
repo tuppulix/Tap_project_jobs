@@ -1,0 +1,13 @@
+FROM python:3.13-rc-slim-bullseye
+
+WORKDIR /app
+
+RUN mkdir archive
+
+COPY producer.py .
+
+COPY archive/job_descriptions_subset.csv archive/
+
+RUN pip install requests
+
+CMD ["python", "-u", "producer.py"]

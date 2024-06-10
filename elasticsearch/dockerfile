@@ -1,3 +1,1 @@
-FROM elasticsearch:latest
-
-EXPOSE 9200
+FROM docker.elastic.co/elasticsearch/elasticsearch:8.13.4

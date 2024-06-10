@@ -12,17 +12,26 @@ RUN tar -xvzf spark-3.4.3-bin-hadoop3.tgz
 
 COPY consumer.py ./
 
+COPY ridge_model.pkl ./
+
 RUN apt-get update && apt-get install -y python3-pip 
 
 RUN pip install pyspark==3.4.3  --break-system-packages
 
 RUN pip install findspark  --break-system-packages
 
-RUN pip install elasticsearch==8.2.0  --break-system-packages
+RUN pip install elasticsearch==8.13.2  --break-system-packages
+
+RUN pip install pandas==2.2.2 --break-system-packages
+
+RUN pip install pyarrow==16.1.0 --break-system-packages
+
+RUN pip install scikit-learn==1.5.0 --break-system-packages
+
 
 RUN ln -s /opt/spark-3.4.3-bin-hadoop3 /opt/spark
 
 ENV PATH="${PATH}:/usr/bin/python3"
 ENV PATH="${PATH}:/opt/spark/spark-3.4.3-bin-hadoop3"
 
-ENTRYPOINT ["spark-submit", "--packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.1", "consumer.py"]
+ENTRYPOINT ["spark-submit", "--packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.1,org.elasticsearch:elasticsearch-spark-30_2.12:8.13.4", "consumer.py"]

@@ -4,7 +4,6 @@ WORKDIR /app
 
 RUN pip install requests
 
-
 RUN mkdir archive
 
 COPY producer.py .

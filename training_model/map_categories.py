@@ -8,29 +8,24 @@ from pyspark.sql.functions import *
 import findspark
 
 
-def map_categories(df,column, mapped):
-    """ dfselected = dataset.select(column).collect()
-    list_of_categories = [x[column] for x in dfselected]
-    list_of_categories = list(set(list_of_categories))
-    mapped = {category: i for i, category in enumerate(list_of_categories)}
-    apply_cat_udf = udf(lambda x: mapped[x], IntegerType())
-    dataset = dataset.withColumn(column, apply_cat_udf(dataset[column]))
-    mapped_fin = {v: k for k, v in mapped.items()}
-    return dataset, mapped_fin """
-
-        # Get unique categories
-
-    # Define a function to apply the mapping (using lambda for brevity)
+def map_categories(df, column, mapped):
+    """
+    Maps categories in the specified column of a DataFrame to integer values based on the provided mapping.
+    
+    Args:
+        df (DataFrame): The input DataFrame.
+        column (str): The column name containing categorical values to be mapped.
+        mapped (dict): A dictionary mapping original category values to integers.
+    
+    Returns:
+        DataFrame: The DataFrame with the specified column mapped to integers.
+    """
+    
+    # Define a function to apply the mapping
     def apply_mapping(x):
         return mapped[x]
 
-    # Apply the mapping to the column
+    # Apply the mapping to the column using the defined function
     df[column] = df[column].apply(apply_mapping)
 
-    # Create a mapping from encoded value to original category (optional)
-
     return df
-
-
-
-

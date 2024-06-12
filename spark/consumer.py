@@ -69,31 +69,15 @@ def process_batch(batch_df, batch_id):
             batch_df = batch_df.withColumn(colu, inverse_udf(col(colu)))
     else:
         return
-            
+    
+    batch_df = batch_df.withColumn("date", date_format(col("timestamp"), "yyyy-MM-dd'T'HH:mm:ss'Z'"))
     
     # Write the batch DataFrame to the console
     batch_df.write \
         .format("console") \
         .option("truncate", False) \
         .save()
-        
-    # Write the batch DataFrame to Elasticsearch
-    # batch_df = batch_df.selectExpr(
-    #     "Job Id",
-    #     "Experience",
-    #     "CAST(Qualifications AS STRING) AS Qualifications",
-    #     "CAST(location AS STRING) AS location",
-    #     "CAST(Country AS STRING) AS Country",
-    #     "CAST(latitude AS STRING) AS latitude",
-    #     "CAST(longitude AS STRING) AS longitude",
-    #     "CAST(`Work Type` AS STRING) AS `Work Type`",
-    #     "CAST(`Company Size` AS STRING) AS `Company Size`",
-    #     "CAST(Preference AS STRING) AS Preference",
-    #     "CAST(`Job Title` AS STRING) AS `Job Title`",
-    #     "CAST(Role AS STRING) AS Role",
-    #     "Salary",
-    #     "timestamp"
-    # )
+    
     batch_df.write.format("es").option("truncate", False) \
         .option("checkpointLocation", "/tmp/") \
         .option("es.port", "9200") \

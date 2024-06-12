@@ -6,31 +6,36 @@ from pyspark.conf import SparkConf
 from pyspark.sql.types import *
 from pyspark.sql.functions import *
 from pyspark.sql import Window
+from typing import TypeVar
+import json
 
 import findspark
 import pandas as pd
 import pickle
 
+
 @pandas_udf(DoubleType())
 def predict_salary(*features: pd.Series) -> pd.Series:
     global model
-    col_names = ["Experience", "Qualifications", "location", "Country", "latitude", "longitude", "Work Type", "Company Size", "Preference", "Job Title", "Role", "timestamp"]
+    col_names = ["Experience", "Qualifications", "location", "Country", "latitude", "longitude", "Work Type", "Company Size", "Preference", "Job Title", "Role"]
     features = pd.concat(features, axis=1)
     features.columns = col_names
     if features["Qualifications"].isnull().values.any():
         return pd.Series([0]*len(features))
-    print(features.head())
-    features = features.drop(columns=["timestamp"])
-
     predictions = model.predict(features)
     return pd.Series(predictions)
 
 def process_batch(batch_df, batch_id):
     
+    
+    global inverse_mappings
+
+        
     print(f"Processing batch {batch_id}")
     batch_df.show()
     
     batch_df = batch_df \
+        .withColumn("Job Id", batch_df["Job Id"]) \
         .withColumn("Qualifications", batch_df["Qualifications"].cast(IntegerType())) \
         .withColumn("location", batch_df["location"].cast(IntegerType())) \
         .withColumn("Country", batch_df["Country"].cast(IntegerType())) \
@@ -42,8 +47,21 @@ def process_batch(batch_df, batch_id):
         .withColumn("Job Title", batch_df["Job Title"].cast(IntegerType())) \
         .withColumn("Role", batch_df["Role"].cast(IntegerType())) \
         .withColumn("Experience", batch_df["Experience"].cast(FloatType()))
+        
+    model_cols = ["Experience", "Qualifications", "location", "Country", "latitude", "longitude", "Work Type", "Company Size", "Preference", "Job Title", "Role"]
     
-    batch_df = batch_df.withColumn("Salary", predict_salary(*[col(colmn) for colmn in batch_df.columns]))
+    batch_df = batch_df.withColumn("Salary", predict_salary(*[col(colmn) for colmn in model_cols]))
+    
+    col_names = ["Qualifications", "location", "Country", "Work Type", "Preference", "Job Title", "Role"]
+    
+    if batch_df.filter(col("Qualifications").isNull()).count() == 0:
+        for colu in col_names:
+            def inverse_map_category(encoded: pd.Series) -> pd.Series:
+                return pd.Series([inverse_mappings[colu][str(enc)] for enc in encoded])
+            inverse_udf = pandas_udf(inverse_map_category, StringType())
+            batch_df = batch_df.withColumn(colu, inverse_udf(col(colu)))
+            
+    batch_df = batch_df.dropna()
         
     batch_df.write \
         .format("console") \
@@ -53,9 +71,9 @@ def process_batch(batch_df, batch_id):
     batch_df.write.format("es").option("truncate", False) \
         .option("checkpointLocation","/tmp/").option("es.port","9200").option("es.nodes","https://10.0.9.28:9200") \
         .option("es.nodes.wan.only", "false") \
-        .option("es.resource", "jobs").mode("append").save()
+        .option("es.resource", "xyz").mode("append").save()
 
-
+inverse_mappings = json.load(open("inverse_mappings.json", "r"))
 
 address = "http://10.0.9.23:9092"
 findspark.init()
@@ -79,6 +97,7 @@ dt = spark \
 from pyspark.sql.types import StructType, StringType, IntegerType, DoubleType
 
 data_schema = StructType() \
+    .add("Job Id", StringType()) \
     .add("Experience", StringType()) \
     .add("Qualifications", StringType()) \
     .add("location", StringType()) \

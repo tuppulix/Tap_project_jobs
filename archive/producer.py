@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 
 # Apre il file CSV in modalità lettura
-time.sleep(5)
+time.sleep(30)
 first = True
 with open("archive/job_descriptions_streaming.csv", "r") as csv_file:
     # Legge il file riga per riga

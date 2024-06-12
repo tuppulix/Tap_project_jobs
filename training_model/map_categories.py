@@ -8,7 +8,7 @@ from pyspark.sql.functions import *
 import findspark
 
 
-def map_categories(df,column):
+def map_categories(df,column, mapped):
     """ dfselected = dataset.select(column).collect()
     list_of_categories = [x[column] for x in dfselected]
     list_of_categories = list(set(list_of_categories))
@@ -19,10 +19,6 @@ def map_categories(df,column):
     return dataset, mapped_fin """
 
         # Get unique categories
-    categories = df[column].unique().tolist()
-
-    # Create a mapping from category to integer
-    mapped = {category: i for i, category in enumerate(categories)}
 
     # Define a function to apply the mapping (using lambda for brevity)
     def apply_mapping(x):
@@ -33,7 +29,7 @@ def map_categories(df,column):
 
     # Create a mapping from encoded value to original category (optional)
 
-    return df, mapped
+    return df
 
 
 

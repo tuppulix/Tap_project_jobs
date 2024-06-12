@@ -2,12 +2,13 @@ FROM python:3.13-rc-slim-bullseye
 
 WORKDIR /app
 
+RUN pip install requests
+
+
 RUN mkdir archive
 
 COPY producer.py .
 
-COPY archive/job_descriptions_subset.csv archive/
-
-RUN pip install requests
+COPY archive/job_descriptions_streaming.csv archive/
 
 CMD ["python", "-u", "producer.py"]

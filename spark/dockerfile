@@ -2,6 +2,7 @@ FROM ubuntu:23.10
 
 USER root
 
+
 RUN apt-get update && apt-get install -y openjdk-17-jdk
 
 RUN apt-get install wget -y 
@@ -9,10 +10,6 @@ RUN apt-get install wget -y
 RUN wget https://dlcdn.apache.org/spark/spark-3.4.3/spark-3.4.3-bin-hadoop3.tgz
 
 RUN tar -xvzf spark-3.4.3-bin-hadoop3.tgz
-
-COPY consumer.py ./
-
-COPY ridge_model.pkl ./
 
 RUN apt-get update && apt-get install -y python3-pip 
 
@@ -30,6 +27,13 @@ RUN pip install scikit-learn==1.5.0 --break-system-packages
 
 
 RUN ln -s /opt/spark-3.4.3-bin-hadoop3 /opt/spark
+
+
+COPY consumer.py ./
+
+COPY ridge_model.pkl ./
+
+COPY inverse_mappings.json ./
 
 ENV PATH="${PATH}:/usr/bin/python3"
 ENV PATH="${PATH}:/opt/spark/spark-3.4.3-bin-hadoop3"

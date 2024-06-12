@@ -71,16 +71,16 @@ services:
       tap:
         ipv4_address: 10.0.9.25
 
-  # producer:
-  #   container_name: producer 
-  #   build:
-  #     context: ./archive
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     - fluentd
-  #   networks:
-  #     tap:
-  #       ipv4_address: 10.0.9.26
+  producer:
+    container_name: producer 
+    build:
+      context: ./archive
+      dockerfile: Dockerfile
+    depends_on:
+      - fluentd
+    networks:
+      tap:
+        ipv4_address: 10.0.9.26
 
   spark:
     container_name: spark
@@ -95,50 +95,31 @@ services:
       tap:
         ipv4_address: 10.0.9.27
 
-  elastic:
-    container_name: elastic
-    build: 
-      context: ./elasticsearch
-      dockerfile: Dockerfile
-    volumes:
-      - ./resources/dataset/datas:/opt/datas
-    restart: on-failure
+#elastic
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    container_name: elasticsearch
     ports:
       - 9200:9200
-      - 9300:9300
-    environment:
-      - "discovery.type=single-node"
-      - "xpack.security.enabled=false" # Disabilita la sicurezza se non necessario
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-      # Aggiungi altre opzioni di configurazione delle prestazioni se necessario
-    healthcheck:
-      test: ["CMD-SHELL", "curl --silent localhost:9200/_cluster/health"]
-      interval: 30s
-      timeout: 30s
-      retries: 5
     networks:
       tap:
         ipv4_address: 10.0.9.28
 
- #--- Kibana ---
+#--- Kibana ---
   kibana:
-    container_name: kibana
     image: docker.elastic.co/kibana/kibana:8.13.4
-    build: 
-      context: ./kibana
-      dockerfile: Dockerfile
-    hostname: kibana
-
-    volumes:
-      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
-
-    depends_on:
-      - elastic
-    ports:
-      - 5601:5601
     environment:
-      - xpack.security.enabled=false
-      - KBN_PATH_CONF=/usr/share/kibana/config
+      - elasticsearch.hosts=http://10.0.9.28:9200
+      - xpack.monitoring.ui.container.elasticsearch.enabled=true
+      - server.host="kibana"
+      - server.name=kibana
+      - xpack.encryptedSavedObjects.encryptionKey=iYU2RF{yT&&-]8D:ew#;b!*6/8=2q:Px
+    container_name: kibana
+    ports:
+      - 5601:5601  
     networks:
       tap:
         ipv4_address: 10.0.9.31

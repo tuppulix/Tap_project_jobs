@@ -14,7 +14,7 @@ My objective is to break the taboo around salary discussions, ensuring that peop
 ## Technologies Used
 
 ### Centralized Service:
-- **[Zookeper](https://zookeeper.apache.org/)**: Used as a centralized service for managing and coordinating nodes within the ecosystem.
+- **[Zookeeper](https://zookeeper.apache.org/)**: Used as a centralized service for managing and coordinating nodes within the ecosystem.
 
 ### Data Ingestion:
 - **[Fluentd](https://www.fluentd.org/)**: Responsible for collecting and sending data from various sources to the data streaming system.

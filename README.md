@@ -1,6 +1,6 @@
 # Tap_project_jobs
 
-<img src="image/logo-color.png" alt="Logo" style="width: 500; height: 500;">
+<img src="image/logo-color.png" alt="Logo" style="width: 425; height: 400;">
 
 
 ## Project Description
@@ -39,19 +39,42 @@ My objective is to break the taboo around salary discussions, ensuring that peop
 Place Spark in the Kafka setup folder:
 [Download Kafka](https://downloads.apache.org/kafka/3.7.0/kafka-3.7.0-src.tgz)
 
-Place the files available at the following link inside the /archive/archive folder: [Download CSV]()
+Place the files available at the following link inside the /archive/archive folder: [Download CSV](https://studentiunict-my.sharepoint.com/:f:/g/personal/brtcml02m30a638u_studium_unict_it/EpBgxkkaCYBNgsEJQPN_AWwBedfeMZilf1whm7nU6Vyvhw?e=Mv1Wed)
 
 ## Initial Setup
 To start the program, follow these steps:
+```bash
+git clone git@github.com:tuppulix/Tap_project_jobs.git
+```
 
-1. Go to the folder: **Tap_project_jobs**
-2. Run `docker network create --subnet=10.0.9.0/24 tap`
-3. Run `docker compose up -d --build`
+Go to the folder: **Tap_project_jobs**
+```bash
+ docker network create --subnet=10.0.9.0/24 tap
+```
+```bash 
+docker compose up -d --build
+```
+
+## to shutdown
+
+```bash
+docker compose down
+```
 
 ## View the Results:
 **KIBANA**: [http://10.0.9.31:5601/](http://10.0.9.31:5601/)
 
-![Kibana Screenshot](/image/kibana_screenshot.png)
+<img src="image/media.png" alt="media" style="width: 300; height: 200;"><img src="image/orizzontale.png" alt="orizzontale" style="width: 300; height: 200;">
+<img src="image/verticale.png" alt="Logo" style="width: 300; height: 200 ;">
+<img src="image/torta.png" alt="Logo" style="width: 300; height: 200;">
+<img src="image/città.png" alt="Logo" style="width: 500; height: 200;">
+
+## Troubleshooting
+In case of error in spark:
+
+``` bash
+docker compose up spark --build  
+```
 
 ## Info
 The project is still in its initial development phase. We're currently focusing on building the frontend portion, which will allow users to interact with the application. Additionally, we're planning to further optimize the machine learning model for better performance.

@@ -77,8 +77,8 @@ docker compose up spark --build
 ```
 
 ## Info
-The project is still in its initial development phase. We're currently focusing on building the frontend portion, which will allow users to interact with the application. Additionally, we're planning to further optimize the machine learning model for better performance.
+The project is still in its initial development phase. We're currently focusing on building the frontend portion, allowing users to interact with the application. We're also planning to optimize the machine learning model for better performance.
 
 Every use for profit is illegal and prohibited.
-
+28/30 
 C.B
